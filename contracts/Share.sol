@@ -2,15 +2,17 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./HEXProxy.sol";
-import "./HEXStakePool.sol";
+import "./StakePool.sol";
 
-contract HEXShare is ERC20 {
+contract Share is ERC20 {
     HEXProxy private _hex;
-    HEXStakePool private _pool;
+    StakePool private _pool;
 
-    constructor(address hex_address, address pool_address) ERC20("HEXSHARE", "HEXSHARE") {
+    constructor(address hex_address, address pool_address)
+        ERC20("SHAREDAY", "SHAREDAY")
+    {
         _hex = HEXProxy(hex_address);
-        _pool = HEXStakePool(pool_address);
+        _pool = StakePool(pool_address);
     }
 
     function mint(uint256 amount) public {
@@ -23,6 +25,6 @@ contract HEXShare is ERC20 {
     }
 
     function getShareRate() public view returns (uint256) {
-        return  _hex.globalInfo()[2];
+        return _hex.globalInfo()[2];
     }
 }

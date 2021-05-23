@@ -1,22 +1,24 @@
 const HEX = artifacts.require('HEX');
-const HEXShare = artifacts.require("HEXShare");
-const HEXStakePool = artifacts.require("HEXStakePool")
+const Share = artifacts.require("Share");
+const StakePool = artifacts.require("StakePool")
 
-contract('HEXShare', (accounts) => {
+contract('Share', (accounts) => {
   it('should mint tokens to sender', async () => {
     const hex = await HEX.deployed();
-    const shares = await HEXShare.deployed();
-    const pool = await HEXStakePool.deployed();
+    const shares = await Share.deployed();
+    const pool = await StakePool.deployed();
 
     // get some HEX for account 0
     await hex.freeClaim(10000);
 
     // approve the hexshare contract to transfer HEX
     const balance = parseInt((await hex.balanceOf.call(accounts[0])).toString());
-    await hex.approve(shares.address, balance);
+    const app = await hex.approve(shares.address, balance);
+    console.log('gas used to approve', app.receipt.gasUsed)
 
     // mint the shares
-    await shares.mint(balance);
+    const res = await shares.mint(balance);
+    console.log('gas used to mint', res.receipt.gasUsed)
 
     // check the balances
     const myShares = await shares.balanceOf.call(accounts[0]);
