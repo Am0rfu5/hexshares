@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 import "./HEXProxy.sol";
 
 contract GovernedStakePool {
-    uint256 internal constant STAKE_LENGTH = 5555;
+    uint256 internal constant STAKE_LENGTH = 7;
     uint256 internal constant MINIMUM_STAKED_HEX = 1000;
 }
 
@@ -18,6 +18,7 @@ contract StakePool is GovernedStakePool {
         uint40 stakeId;
         uint72 stakedHearts;
         uint256 startDay;
+        uint256 endDay;
         bool unstaked;
     }
 
@@ -54,9 +55,34 @@ contract StakePool is GovernedStakePool {
                 uint40(lastStakeId()),
                 uint72(newStakedHearts),
                 startDay,
+                startDay + STAKE_LENGTH,
                 false
             )
         );
+    }
+
+    function endStake(uint256 index) external {
+        // grab the relevant days
+        uint256 currentDay = _hex.currentDay();
+
+        // grab the stake
+        require(stakes.length != 0, "HEX: Empty stake list");
+        require(index < stakes.length, "HEX: stakeIndex invalid");
+        Stake memory stake = stakes[index];
+
+        // verify the stake.
+        require(!stake.unstaked, "You cannot end a stake that is unstaked");
+        // stakes entered on day 0 lasting n days end after n + 2 days for a 1 day buffer on each side
+        require(
+            currentDay > stake.endDay + 1,
+            "You cannot end a stake before it's due"
+        );
+
+        // end the stake
+        _hex.stakeEnd(index, stake.stakeId);
+        stakes[index].unstaked = true;
+
+        // TODO: transfer HEX back to shares
     }
 
     function lastStakeId() public view returns (uint256) {

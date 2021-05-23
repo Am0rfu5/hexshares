@@ -47,4 +47,33 @@ contract('StakePool', (accounts) => {
         }
     });
 
+    it('should end stake', async () => {
+        const hex = await HEX.deployed();
+        const pool = await StakePool.deployed();
+
+        // try to end a stake early
+        try {
+            await pool.endStake(0);
+        } catch (e) {
+            assert.equal(e.reason, 'You cannot end a stake before it\'s due');
+        }
+
+        // advance the days and end the stake
+        await hex.setDay(9);
+        await pool.endStake(0);
+
+        try {
+            await pool.endStake(1);
+        } catch (e) {
+            assert.equal(e.reason, 'You cannot end a stake before it\'s due');
+        }
+
+        // end a non existant stake
+        try {
+            await pool.endStake(2);
+        } catch (e) {
+            assert.equal(e.reason, 'HEX: stakeIndex invalid');
+        }
+
+    });
 });

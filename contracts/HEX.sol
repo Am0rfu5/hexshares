@@ -502,6 +502,11 @@ abstract contract GlobalsAndUtility is ERC20 {
 
     function setDay(uint256 day) public {
         _day = day;
+
+        GlobalsCache memory g;
+        GlobalsCache memory gSnapshot;
+        _globalsLoad(g, gSnapshot);
+        _dailyDataUpdateAuto(g);
     }
 
     function _dailyDataUpdateAuto(GlobalsCache memory g) internal {
