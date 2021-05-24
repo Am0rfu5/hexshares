@@ -25,5 +25,11 @@ contract HEXProxy {
         uint256 amount
     ) public virtual returns (bool) {}
 
+    function transfer(address recipient, uint256 amount)
+        public
+        virtual
+        returns (bool)
+    {}
+
     function balanceOf(address account) public view virtual returns (uint256) {}
 }
