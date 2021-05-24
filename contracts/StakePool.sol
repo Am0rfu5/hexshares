@@ -20,7 +20,6 @@ struct Stake {
 contract StakePool is GovernedStakePool, StakeCalculator {
     HEXProxy private _hex;
 
-    mapping(uint256 => uint256) public stakingDays; // day to stake index
     Stake[] public stakes;
 
     uint256 internal constant MINIMUM_STAKED_HEARTS =
@@ -31,14 +30,6 @@ contract StakePool is GovernedStakePool, StakeCalculator {
     }
 
     function startStake() external {
-        // verify that we haven't staked yet today
-        uint256 lockDay = _hex.currentDay();
-        require(
-            stakes.length == 0 ||
-                (stakingDays[lockDay] == uint256(0) && lockDay != 0),
-            "HEX has already been staked today"
-        );
-
         // determine the staking size and verify it.
         uint256 _stakedHearts = _hex.balanceOf(address(this));
         require(
@@ -51,10 +42,10 @@ contract StakePool is GovernedStakePool, StakeCalculator {
             _calcStakeShares(_stakedHearts, shareRate(), STAKE_LENGTH);
 
         // begin the stake.
+        uint256 lockDay = _hex.currentDay();
         _hex.stakeStart(_stakedHearts, STAKE_LENGTH);
 
         // store the stake for future retrieval
-        stakingDays[lockDay] = stakes.length;
         stakes.push(
             Stake(
                 uint40(lastStakeId()),
