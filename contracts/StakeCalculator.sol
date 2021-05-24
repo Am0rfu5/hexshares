@@ -1,5 +1,10 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+/**
+ * @title StakeCalculator
+ * @dev StakeCalculator is a library that allows users to calculate the shares for a new stake.
+ */
 abstract contract StakeCalculator {
     uint256 internal constant HEARTS_PER_HEX = 100000000;
 
@@ -18,7 +23,13 @@ abstract contract StakeCalculator {
 
     /* Share rate is scaled to increase precision */
     uint256 internal constant SHARE_RATE_SCALE = 1e5;
-
+    
+    /**
+     * @dev Calculate the shares for a new stake
+     * @param _stakedHearts Number of Hearts to stake
+     * @param _shareRate Current share rate
+     * @param _stakedDays Number of days to stake
+     */
     function _calcStakeShares(
         uint256 _stakedHearts,
         uint256 _shareRate,
